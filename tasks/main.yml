@@ -1,0 +1,66 @@
+---
+# NOTES
+# -----
+# controls active and configured mount points in /etc/fstab
+
+# MOUNT OPTIONS
+# -------------
+# see ../mount-options.md
+
+- name: mount role
+  tags:
+    - mount
+  block:
+
+  - name: Check if required variables are set
+    ansible.builtin.assert:
+      that:
+        - mount.point.path != None
+        - mount.type != None
+        - mount.user != None
+
+  # mkdir mountpoint
+  - name: Mkdir {{ mount.point.path }}
+    become: true
+    ansible.builtin.file:
+      path: "{{ mount.point.path }}"
+      state: directory
+      owner: "{{ mount.point.owner }}"
+      group: "{{ mount.point.owner }}"
+      mode: "{{ mount.point.mode }}"
+
+  # smb || cifs
+  - when: (mount.type == "smb") or (mount.type == "cifs")
+    block:
+        
+    # mkdir credentials
+    - name: Mkdir {{ mount.smb.path_credentials }}
+      become: true
+      ansible.builtin.file:
+        path: "{{ mount.smb.path_credentials | dirname }}"
+        state: directory
+        owner: "{{ mount.user }}"
+        group: "{{ mount.user }}"
+        mode: '0700' # -rwx------
+
+    # smb credentials
+    - name: Template smb credentials
+      become: true
+      ansible.builtin.template:
+        src: smbcredentials.j2
+        dest: "{{ mount.smb.path_credentials }}"
+        owner: "{{ mount.user }}"
+        group: "{{ mount.user }}"
+        mode: '0600' # -rw-------
+
+    # fstab
+    - name: Add fstab entry for {{ mount.point.path }}
+      become: true
+      notify: Systemd daemon-reload
+      ansible.posix.mount:
+        fstype: cifs
+        opts: "{{ mount.smb.options }}"
+        path: "{{ mount.point.path }}"
+        src: "{{ mount.smb.src }}"
+        state: present # only specifies that the device is to be configured in fstab and does not trigger or require a mount
+        # state: mounted # the device will be actively mounted and appropriately configured in fstab. If the mount point is not present, the mount point will be created
