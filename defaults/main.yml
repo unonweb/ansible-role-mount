@@ -7,7 +7,7 @@ mount:
     src: 
     user: 
     pass: 
-    options: vers=3.0,file_mode=0666,dir_mode=0777,rw,cache=loose,users,auto,_netdev,x-gvfs-show,noexec,nosuid,nodev,nofail,x-systemd.device-timeout=15,credentials=/home/{{ user }}/.credentials/smbcredentials
+    options: vers=3.0,file_mode=0666,dir_mode=0777,rw,cache=loose,users,auto,_netdev,x-gvfs-show,noexec,nosuid,nodev,nofail,x-systemd.device-timeout=15,credentials=/home/{{ mount.user }}/.credentials/smbcredentials
     path_credentials: # /home/{{ user }}/.credentials/smbcredentials # also change in mount options
   point:
     path:
