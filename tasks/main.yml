@@ -12,12 +12,16 @@
     - mount
   block:
 
+  - when: false
+    ansible.builtin.debug:
+      msg: "{{ mount }}"
+
   - name: Check if required variables are set
     ansible.builtin.assert:
       that:
-        - mount.point.path != None
-        - mount.type != None
-        - mount.user != None
+      - mount.point.path != None
+      - mount.type != None
+      - mount.user != None
 
   # mkdir mountpoint
   - name: Mkdir {{ mount.point.path }}
