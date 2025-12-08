@@ -12,59 +12,29 @@
     - mount
   block:
 
+  # debug
   - when: false
     ansible.builtin.debug:
       msg: "{{ mount }}"
-
+  
+  # assertions
   - name: Check if required variables are set
     ansible.builtin.assert:
       that:
-      - mount.point.path != None
-      - mount.type != None
-      - mount.user != None
+      - mount_point != None
+      - mount_type != None
+      - mount_user != None
 
   # mkdir mountpoint
-  - name: Mkdir {{ mount.point.path }}
+  - name: Mkdir {{ mount_point }}
     become: true
     ansible.builtin.file:
-      path: "{{ mount.point.path }}"
+      path: "{{ mount_point }}"
       state: directory
-      owner: "{{ mount.point.owner }}"
-      group: "{{ mount.point.owner }}"
-      mode: "{{ mount.point.mode }}"
+      owner: "{{ mount_point_owner }}"
+      group: "{{ mount_point_owner }}"
+      mode: "{{ mount_point_mode }}"
 
   # smb || cifs
-  - when: (mount.type == "smb") or (mount.type == "cifs")
-    block:
-        
-    # mkdir credentials
-    - name: Mkdir {{ mount.smb.path_credentials }}
-      become: true
-      ansible.builtin.file:
-        path: "{{ mount.smb.path_credentials | dirname }}"
-        state: directory
-        owner: "{{ mount.user }}"
-        group: "{{ mount.user }}"
-        mode: '0700' # -rwx------
-
-    # smb credentials
-    - name: Template smb credentials
-      become: true
-      ansible.builtin.template:
-        src: smbcredentials.j2
-        dest: "{{ mount.smb.path_credentials }}"
-        owner: "{{ mount.user }}"
-        group: "{{ mount.user }}"
-        mode: '0600' # -rw-------
-
-    # fstab
-    - name: Add fstab entry for {{ mount.point.path }}
-      become: true
-      notify: Systemd daemon-reload
-      ansible.posix.mount:
-        fstype: cifs
-        opts: "{{ mount.smb.options }}"
-        path: "{{ mount.point.path }}"
-        src: "{{ mount.smb.src }}"
-        state: present # only specifies that the device is to be configured in fstab and does not trigger or require a mount
-        # state: mounted # the device will be actively mounted and appropriately configured in fstab. If the mount point is not present, the mount point will be created
+  - when: (mount_type == "smb") or (mount_type == "cifs")
+    ansible.builtin.import_tasks: mount.smb.yml

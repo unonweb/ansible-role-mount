@@ -1,0 +1,32 @@
+---
+# mkdir credentials
+- name: Mkdir {{ mount_smb_credentials }}
+  become: true
+  ansible.builtin.file:
+    path: "{{ mount_smb_credentials | dirname }}"
+    state: directory
+    owner: "{{ mount_user }}"
+    group: "{{ mount_user }}"
+    mode: '0700' # -rwx------
+
+# smb credentials
+- name: Template smb credentials
+  become: true
+  ansible.builtin.template:
+    src: smbcredentials.j2
+    dest: "{{ mount_smb_credentials }}"
+    owner: "{{ mount_user }}"
+    group: "{{ mount_user }}"
+    mode: '0600' # -rw-------
+
+# fstab
+- name: Add fstab entry for {{ mount_point }}
+  become: true
+  notify: Systemd daemon-reload
+  ansible.posix.mount:
+    fstype: cifs
+    opts: "{{ mount_smb_options }}"
+    path: "{{ mount_point }}"
+    src: "{{ mount_smb_src }}"
+    state: present # only specifies that the device is to be configured in fstab and does not trigger or require a mount
+    # state: mounted # the device will be actively mounted and appropriately configured in fstab. If the mount point is not present, the mount point will be created
