@@ -1,12 +1,20 @@
-Links
+NOTES
 =====
+
+- controls active and configured mount points in /etc/fstab
+
+MOUNT OPTIONS
+=============
+
+Links
+-----
 
 - https://wiki.ubuntuusers.de/fstab/
 - https://www.freedesktop.org/software/systemd/man/latest/systemd.mount.html
 - https://www.samba.org/~ab/output/htmldocs/manpages-3/mount.cifs.8.html
 
 Options
-=======
+-------
 
 ## defaults 
 rw,suid,dev,exec,auto,nouser,async
