@@ -1,18 +1,10 @@
 ---
-# NOTES
-# -----
-# controls active and configured mount points in /etc/fstab
-
-# MOUNT OPTIONS
-# -------------
-# see ../mount-options.md
-
 - name: mount role
   tags:
     - mount
   block:
 
-  # debug
+  # debug 
   - when: false
     ansible.builtin.debug:
       msg: "{{ mount }}"
