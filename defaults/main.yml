@@ -1,6 +1,6 @@
 ---
 mount_user:
-mount_restart_daemons: false
+mount_restart_daemons: true # required after changing fstab
 mount_type:
 mount_point:
 mount_point_owner: root
