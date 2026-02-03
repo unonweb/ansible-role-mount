@@ -2,11 +2,19 @@
 mount_user:
 mount_restart_daemons: true # required after changing fstab
 mount_type:
+# MOUNT POINT
 mount_point:
 mount_point_owner: root
 mount_point_mode: u=rwx,g=rx,o=rx
+# SMB
 mount_smb_src:
 mount_smb_user:
 mount_smb_pass:
 mount_smb_options: vers=3.0,file_mode=0666,dir_mode=0777,rw,cache=loose,users,auto,_netdev,x-gvfs-show,noexec,nosuid,nodev,nofail,x-systemd.device-timeout=15,credentials=/home/{{ mount_user }}/.credentials/smbcredentials
 mount_smb_credentials: /home/{{ mount_user }}/.credentials/smbcredentials # also change in mount options
+# DAVFS
+mount_davfs_url:
+mount_davfs_user:
+mount_davfs_pw:
+mount_davfs_options:
+# user and pw are added to ~/.davfs2/secrets

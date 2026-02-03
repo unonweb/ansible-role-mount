@@ -1,0 +1,60 @@
+---
+# install
+- name: Apt install davfs2
+  become: true
+  ansible.builtin.apt:
+    name: davfs2
+    state: present
+
+# chown
+- name: Set owner of /home/{{ mount_user }}/.davfs2
+  become: true
+  ansible.builtin.file:
+    state: directory
+    path: "/home/{{ mount_user }}/.davfs2"
+    owner: "{{ mount_user }}"
+    group: "{{ mount_user }}"
+
+# add credentials to ~/.davfs2/secretsto ~/.davfs2/secrets
+- name: Add credentials to ~/.davfs2/secrets
+  become: true
+  ansible.builtin.lineinfile:
+    path: "/home/{{ mount_user }}/.davfs2/secrets"
+    line: "{{ mount_point }} {{ mount_davfs_user }} {{ mount_davfs_pw }}" # The line to insert/replace
+    state: present
+    create: true # If specified, the file will be created if it does not already exist
+    backup: true
+    owner: "{{ mount_user }}"
+    group: "{{ mount_user }}"
+    mode: u=rw,g=,o=
+
+# fstab
+- name: Add fstab entry for {{ mount_point }}
+  become: true
+  notify: Systemd daemon-reload
+  ansible.posix.mount:
+    fstype: davfs
+    opts: "{{ mount_davfs_options }}"
+    path: "{{ mount_point }}"
+    src: "{{ mount_davfs_url }}"
+    state: present
+    # state: present 
+    # -> only specifies that the device is to be configured in fstab and does not trigger or require a mount
+    # state: mounted 
+    # -> the device will be actively mounted and appropriately configured in fstab. If the mount point is not present, the mount point will be created
+
+# add user to davfs2 group
+- name: Add {{ mount_user }} to davfs2 group
+  become: true
+  ansible.builtin.user:
+    name: "{{ mount_user }}"
+    append: true
+    groups: davfs2
+
+# setuid on /sbin/mount.davfs
+- name: Set setuid-bit on /sbin/mount.davfs
+  become: true
+  ansible.builtin.file:
+    path: /sbin/mount.davfs
+    mode: u=rwxs
+    

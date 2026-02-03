@@ -10,7 +10,7 @@
       msg: "{{ mount }}"
   
   # assertions
-  - name: Check if required variables are set
+  - name: Assertions for mount role
     ansible.builtin.assert:
       that:
       - mount_point != None
@@ -30,3 +30,7 @@
   # smb || cifs
   - when: (mount_type == "smb") or (mount_type == "cifs")
     ansible.builtin.import_tasks: mount.smb.yml
+
+  # davfs
+  - when: (mount_type == "davfs") or (mount_type == "davfs2")
+    ansible.builtin.import_tasks: mount.davfs.yml
