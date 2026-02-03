@@ -13,8 +13,9 @@ Links
 - https://www.freedesktop.org/software/systemd/man/latest/systemd.mount.html
 - https://www.samba.org/~ab/output/htmldocs/manpages-3/mount.cifs.8.html
 
-Options
--------
+
+General Options
+---------------
 
 ## defaults 
 rw,suid,dev,exec,auto,nouser,async
@@ -53,3 +54,8 @@ They also pull in network-online.target and are ordered after it and network.tar
 ## cache=loose
 Warnung im Stackexchange Beitrag  "cache=loose can cause data corruption when multiple readers and writers are working on the same files."
 Findet sich aber nicht (mehr) im Link zu den man-pages
+
+Davfs Options
+-------------
+
+- https://manpages.debian.org/trixie/davfs2/mount.davfs.8.en.html#OPTIONS
