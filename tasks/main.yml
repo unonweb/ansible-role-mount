@@ -26,6 +26,17 @@
       owner: "{{ mount_point_owner }}"
       group: "{{ mount_point_owner }}"
       mode: "{{ mount_point_mode }}"
+      recurse: true
+
+  # chown /media
+  - name: Chown root /media
+    become: true
+    ansible.builtin.file:
+      path: "/media"
+      state: directory
+      owner: "root"
+      group: "root"
+      mode: "u=rwx,g=rx,o=rx"
 
   # smb || cifs
   - when: (mount_type == "smb") or (mount_type == "cifs")
